@@ -1,0 +1,347 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<script src="~/Scripts/jquery-3.4.1.js"></script>
+<script src="~/Scripts/bootstrap.js"></script>
+<link href="~/Content/bootstrap.css" rel="stylesheet" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+<h2>Index</h2>
+
+<style>
+    .product-row {
+        background-color: #f2f2f2; /* Light gray background color */
+        /* Border bottom with a darker shade */
+    }
+
+        .product-row:hover {
+            background-color: #d4ebe7; /* Hover effect with slightly darker background */
+        }
+
+    .product-rowh {
+        background-color: #e6e6ff; /* Light gray background color */
+        /* Border bottom with a darker shade */
+    }
+
+    #modal-css {
+        background-color: #e6e6ff;
+    }
+</style>
+<script type="text/javascript">
+    $(document).ready(function () {
+        loadData();
+    })
+
+    function loadData() {
+
+        $.ajax({
+
+            url: "/Patient/GetPatients",
+            type: "GET",
+            contentType: "application/json",
+            dataType: "json",
+            success: function (response) {
+                var html = '';
+                $.each(response, function (key, item) {
+                    html += '<tr class = "product-row" >',
+                        html += '<td>' + item.Name + '</td>';
+                    html += '<td>' + item.Email + '</td>';
+                    html += '<td>' + item.Phone + '</td>';
+                    html += '<td>' + new Date(parseInt(item.DateOfBirth.substr(6))).toLocaleDateString() + '</td>';
+                    html += '<td>' + item.BloodGroup + '</td>';
+                    html += '<td>' + item.Weight + '</td>';
+                    html += '<td>' + item.Height + '</td>';
+
+        
+                    //html += '<td>' + new Date(parseInt(item.EndDate.substr(6))).toLocaleDateString() + '</td>';
+                    html += '<td><button type="button" class="btn btn-primary" onclick="return getPatientById(' + item.patientId + ')">Edit Patient</button>';
+                    html += ' <button type="button" class="btn btn-danger" onclick="return Delete(' + item.patientId + ')">Delete Patient</button></td>';
+
+                    html += '</tr>'
+                });
+                $('.tbody').html(html);
+            },
+            error: function (errormessage) {
+                alert(errormessage.responseText);
+            }
+
+        })
+    }
+
+    // function validateProductForm() {
+    //     var Name = $('#name').val();
+    //     var Email = $('#email').val();
+    //     var Phone = $('#phone').val();
+    //     var  DateOfBirth  = $('#dob').val();
+    //     var BloodGroup = $('#bloodgroup').val();
+    //     var Weight = $('#weight').val();
+    //     var Height = $('#height').val();
+    //     Validate each field
+    //     if (name.trim() == '' || email.trim() == '' || phone.trim() == '' || dob.trim() == '' || bloodgroup.trim() == '' || weight.trim() == '' || height.trim() == '') {
+    //         $('#errorMessage').text('All fields are required.');
+    //         return false;
+    //     }
+
+    //     if (isNaN(phone)) {
+    //         $('#errorMessage').text('Phone must be a number.');
+    //         return false;
+    //     }
+
+    //     return true; // All validations passed
+    // }
+
+
+
+    function Add() {
+
+        console.log("Add button clicked");
+        var patientObj = {
+          Name: $('#name').val(),
+          Email: $('#email').val(),
+          Phone: $('#phone').val(),
+          DateOfBirth: $('#dob').val(),
+          BloodGroup: $('#bloodgroup').val(),
+          Weight: $('#weight').val(),
+          Height: $('#height').val()
+
+        }
+        // if (!validateproductform()) {
+        //     return false; // validation failed, abort the operation
+        // }
+        $.ajax({
+            url: "/Patient/RegisterPatient",
+
+            type: "POST",
+            data: JSON.stringify(patientObj),
+
+            contentType: "application/json",
+            dateType: "json",
+            success: function (response) {
+                console.log(response);
+                if (response == true) {
+                    loadData();
+                    $('#myModal').modal('hide');
+                    $('.modal-backdrop').remove();
+                }
+                else {
+                    $('#errorMessage').text('  an error occured ');
+                }
+
+
+            },
+            error: function (errormessage) {
+                alert(errormessage.responseText);
+
+            }
+        })
+    }
+
+    function getPatientById(patientId) {
+
+        $.ajax({
+            url: "/Patient/GetPatientById/" + patientId,
+            type: "GET",
+            contentType: "application/json",
+            dataType: "json",
+            success: function (response) {
+                $('#patientId').val(response.patientId);
+                $('#userId').val(result.userId);
+                $('#name').val(response.Name);
+                $('#email').val(response.Email);
+                $('#phone').val(response.Phone);
+                var DateOfBirth = new Date(parseInt(response.DateOfBirth.substr(6))).toISOString().split('T')[0]; 
+            
+                $('#bloodgroup').val(response.BloodGroup);
+                $('#weight').val(response.Weight);
+                $('#height').val(response.Height);
+
+                $('#myModal').modal('show');
+                $('#btnUpdate').show();
+                $('#btnAdd').hide();
+            },
+            error: function (errormessage) {
+                alert(errormessage.responseText);
+
+            },
+
+
+        })
+    }
+
+    function update() {
+
+        var patientObj = { 
+            UserId: Number($('#userId').val()),
+            PatientId: $('#patientId').val(),
+            Name: $('#name').val(),
+            Email: $('#email').val(),
+            Phone: $('#phone').val(),
+            DateOfBirth: $('#dob').val(),
+            BloodGroup: $('#bloodgroup').val(),
+            Weight: $('#weight').val(),
+            Height: $('#height').val()
+
+        }
+
+
+        // if (!validateProductForm()) {
+        //     return false; // Validation failed, abort the operation
+        // }
+        $.ajax({
+            url: "/Patient/UpdatePatient",
+            data: JSON.stringify(patientObj),
+            type: "POST",
+            contentType: "application/json",
+            dateType: "json",
+            success: function (response) {
+                loadData();
+                $('#myModal').modal('hide');
+                $('.modal-backdrop').remove();
+
+            },
+            error: function (errormessage) {
+                alert(errormessage.responseText);
+            },
+
+
+        })
+       
+
+    }
+
+    function Delete(patientId) {
+        var ans = confirm('are u sure u want to delete product?');
+        if (ans) {
+            $.ajax({
+                url: "/Patient/DeletePatient/",
+                data: JSON.stringify({ patientId: patientId }),
+                type: "POST",
+                contentType: "application/json",
+                dateType: "json",
+                success: function (response) {
+                    loadData();
+
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+
+            })
+        }
+    }
+
+    function clearTextBoxes() {
+        $('#patientId').val("");
+        $('#userId').val("");
+        $('#name').val("");
+        $('#email').val("");
+        $('#phone').val("");
+        $('#dob').val("");
+        $('#bloodgroup').val("");
+        $('#weight').val("");
+        $('#height').val("");
+        $('#btnUpdate').hide();
+        $('#btnAdd').show();
+    }
+
+</script>
+<button type="button" class="btn btn-success btn-square" data-bs-toggle="modal" data-bs-target="#myModal" onclick="clearTextBoxes();">Add new Patient</button>
+
+<center> <h2> Patient Registration </h2></center>
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr class="product-rowh ">
+            <td>Name</td>
+            <td>Email</td>
+            <td>Phone</td>
+            <td>DateOfBirth</td>
+            <td>BloodGroup</td>
+            <td>Weight</td> 
+            <td>Height</td>
+            <td>Action</td>
+        </tr>
+    </thead>
+    <tbody class="tbody">
+    </tbody>
+</table>
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class=" modal-header">
+                <h4 class="modal-title">Add Patient</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modal-css">
+                <input type="hidden" id="patientId" />
+
+                <form>
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="name" placeholder="name of patient" />
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <input type="email" class="form-control" id="email" placeholder="email of patient" />
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="phone" placeholder="phone of patient" />
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <input type="date" class="form-control" id="dob" placeholder=" date of birth" />
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="bloodgroup" placeholder="bloodgroup  of patient" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="weight" placeholder="weight of patient" />
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="height" placeholder="height of patient" />
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <p style="color:red" id="errorMessage"></p>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-success btn semi-circle" id="btnAdd" onclick="Add();">Add</button>
+                <button type="button" class="btn btn-outline-success btn semi-circle" id="btnUpdate" onclick="update();">Update</button>
+            </div>
+        </div>
+    </div>
+</div>

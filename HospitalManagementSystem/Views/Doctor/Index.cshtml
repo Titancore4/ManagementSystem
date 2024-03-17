@@ -1,0 +1,65 @@
+﻿@{
+    ViewBag.Title = "Doctor";
+}
+<script src="~/Scripts/jquery-3.4.1.js"></script>
+<script src="~/Scripts/bootstrap.js"></script>
+<link href="~/Content/bootstrap.css" rel="stylesheet" />
+
+<script type="text/javascript">
+
+    /// <summary>
+    /// Load data from the database when the page is ready
+    /// </summary>
+    $(document).ready(function () {
+        // Load data from the database when the page is ready
+        loadData();
+
+        //Event handler for delete confirmation button click
+        $('#btnConfirmDelete').click(function () {
+            let doctorId = $(this).data('doctorId');
+
+            //Ajax call to delete the doctor based on its ID from database
+            $.ajax({
+                url: "/Doctor/DeleteDoctor/" + doctorId,
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                sucess: function (result) {
+                    if (result == true) {
+                        loadData();
+                    }
+                    else {
+                        if (result == false) {
+                            alert("Doctor could not be deleted");
+                        }
+                        else {
+                            alert("An error occurred while deleting the doctor");
+                        }
+                    }
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+
+            //Close the delete confirmation modal
+            $('#deleteModal').modal('hide');
+        });
+    });
+
+    /// <summary>
+    /// Load data from the database
+    /// </summary>
+    function loadData() {
+        $.ajax({
+            url: "/Doctor/GetDoctors",
+            type: "GET",
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (result) {
+                let html = '';
+                $.each
+
+
+
+</script>
