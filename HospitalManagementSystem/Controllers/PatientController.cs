@@ -1,8 +1,7 @@
-﻿using Entities.Entities;
-using Entities.ViewModels;
+﻿using Entities.ViewModels;
 using IPBLL.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace HospitalManagementSystem.Controllers
 {
@@ -34,11 +33,17 @@ namespace HospitalManagementSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> RegisterPatient([FromBody] PatientsAppointmentsVM patient)
         {
+            // Log the weight of the patient as JSON to the console
+            Console.WriteLine(JsonConvert.SerializeObject(patient.Weight));
+
+            // Call the patientService to add the patient
             var result = patientService.AddPatient(patient);
+
+            // Return the result as JSON
             return Json(result);
         }
 
-     
+
         [HttpPost]
         public IActionResult UpdatePatient([FromBody] PatientsAppointmentsVM patient)
         {
