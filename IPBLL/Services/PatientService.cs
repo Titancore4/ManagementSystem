@@ -8,12 +8,16 @@ using Entities.Entities;
 using IPDAL.Repositories;
 using Entities.ViewModels;
 
-
 namespace IPBLL.Services
 {
     public class PatientService
     {
-         readonly PatientRepository patientRepository = new PatientRepository();
+        private readonly PatientRepository patientRepository;
+
+        public PatientService()
+        {
+            patientRepository = new PatientRepository();
+        }
 
         public List<PatientsAppointmentsVM> GetPatientsAppointmentsVMs()
         {
@@ -30,40 +34,61 @@ namespace IPBLL.Services
                 patientsAppointmentsVM.BloodGroup = patient.BloodGroup;
                 patientsAppointmentsVM.Weight = patient.Weight;
                 patientsAppointmentsVM.Height = patient.Height;
-               patientsAppointmentsVMs.Add(patientsAppointmentsVM);
+                patientsAppointmentsVMs.Add(patientsAppointmentsVM);
+                //Console.WriteLine(patientsAppointmentsVM);
             }
+
             return patientsAppointmentsVMs;
         }
 
-         
         public bool AddPatient(PatientsAppointmentsVM patientFormData)
         {
-            var patient = new Patient();
-           patient.User = new Users();
-           patient.User.UserId = patientFormData.UserId;
-           patient.User.Name = patientFormData.Name;
-           patient.User.Email = patientFormData.Email;
-           patient.User.Phone = patientFormData.Phone;
-           patient.User.DateOfBirth = patientFormData.DateOfBirth;
-           patient.BloodGroup = patientFormData.BloodGroup;
+            if (patientFormData == null)
+            {
+                throw new ArgumentNullException(nameof(patientFormData), "Patient data cannot be null");
+            }
+
+            var patient = new Patient
+            {
+                User = new Users
+                {
+                    UserId = patientFormData.UserId,
+                    Name = patientFormData.Name,
+                    Email = patientFormData.Email,
+                    Phone = patientFormData.Phone,
+                    DateOfBirth = patientFormData.DateOfBirth
+                },
+                BloodGroup = patientFormData.BloodGroup,
+                Weight = patientFormData.Weight,
+                Height = patientFormData.Height
+            };
             return patientRepository.AddPatient(patient);
         }
 
-         
         public bool UpdatePatient(PatientsAppointmentsVM patientFormData)
         {
-            var patient = new Patient();
-            patient.PatientId = patientFormData.PatientId;
-            patient.User = new Users();
-            patient.User.UserId = patientFormData.UserId;
-            patient.User.Name = patientFormData.Name;
-            patient.User.Email = patientFormData.Email;
-            patient.User.Phone = patientFormData.Phone;
-            patient.User.DateOfBirth = patientFormData.DateOfBirth;
-            patient.BloodGroup = patientFormData.BloodGroup;
+            if (patientFormData == null)
+            {
+                throw new ArgumentNullException(nameof(patientFormData), "Patient data cannot be null");
+            }
+
+            var patient = new Patient
+            {
+                PatientId = patientFormData.PatientId,
+                User = new Users
+                {
+                    UserId = patientFormData.UserId,
+                    Name = patientFormData.Name,
+                    Email = patientFormData.Email,
+                    Phone = patientFormData.Phone,
+                    DateOfBirth = patientFormData.DateOfBirth
+                },
+                BloodGroup = patientFormData.BloodGroup,
+                Weight = patientFormData.Weight,
+                Height = patientFormData.Height
+            };
             return patientRepository.UpdatePatient(patient);
         }
-
 
         public bool DeletePatient(int patientId)
         {
